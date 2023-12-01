@@ -1,114 +1,150 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Image identificator</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-        <style>
-            img {
-                transition: transform 0.5s ease-in-out;
-            }
-            .imageContainer {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: auto;
-                width: 100%;
-                margin-bottom: 1em;
-            }
-            .turnLeft {
-                transform: rotate(-90deg);
-            }
-            .turnRight {
-                transform: rotate(90deg);
-            }
-            .turnZero {
-                transform: rotate(0deg);
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Image idenificator</h1>
-        <p><b>Output:</b> <span id="output"></span></p>
-            <section style="display: grid; grid-template-columns: 1fr 1fr">
-                <div>
-                    <h2>Input image</h2>
-                    <div class="imageContainer">
-                        <img
-                            id="input-image"
-                            src=""
-                            title="please wait"
-                            style="width: min(100%,400px)"
-                        />
-                    </div>
-                    <div class="grid">
-                        <button onclick="document.getElementById('input-image').className = 'turnLeft'">Turn left</button>
-                        <button onclick="document.getElementById('input-image').className = 'turnZero'">Back to starting point</button>
-                        <button onclick="document.getElementById('input-image').className = 'turnRight'">Turn right</button>
-                    </div>
-                    <p id="input-text"></p>
-                </div>
-            <div>
 
-                <h2>Suggested result: <span id="code"></span>(<span id="score">X</span>)</h2>
-                <div class="imageContainer">
-                    <img
-                        id="suggested-image"
-                        src=""
-                        title="please wait"
-                        style="width: min(100%,400px)"
-                    />
-                </div>
-            </div>
-        </section>
-        <div style="display: flex; gap: 3em;">
-            <button id="yes-button" onclick="sendMessage('yes')">Yes! They are the same!!!</button>
-            <button id="no-button" onclick="sendMessage('no')">Nop! Give me another suggestion</button>
-            <button id="skip-button" onclick="sendMessage('skip')">Something is weird, skip this card and go to next</button>
-        </div>
+<head>
+  <title>Image identificator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <style>
+    img {
+      transition: transform 0.5s ease-in-out;
+    }
 
-        <script>
-            console.log("Script loaded")
-            let ws;
-            window.onload = function() {
-                console.log("Window loaded")
-                connect()
-            };
-            function connect() {
-                console.log("RunWebSocket")
-                buttonsDisable(true)
-                ws = new WebSocket("ws://localhost:8000/ws");
-                ws.onmessage = function(event) {
-                    let data = JSON.parse(event.data);
-                    switch (data.type) {
-                        case "message":
-                            console.log("message", data);
-                            document.getElementById('output').innerHTML = data.message
-                            break;
-                        case "result":
-                            buttonsDisable(false)
-                            console.log("result", data)
-                            document.getElementById('input-image').src = "/images/not_processed/"+data.input_image
-                            document.getElementById('input-text').innerHTML = data.text
-                            document.getElementById('suggested-image').src = 'https://marvelcdb.com/bundles/cards/'+ data.result_code+'.png'
-                            document.getElementById('code').innerHTML = data.result_code
-                            document.getElementById('score').innerHTML = data.result_score
-                            break;
-                        default:
-                            console.log("Unknown event type " + data.type)
-                    }
-                };
-            }
-            function sendMessage(text) {
-                buttonsDisable(true)
-                ws.send(text)
-            }
+    #already-exists {
+      display: none;
+      color: red;
+    }
 
-            function buttonsDisable(value) {
-                document.getElementById('yes-button').disabled = value
-                document.getElementById('no-button').disabled = value
-                document.getElementById('skip-button').disabled = value
-            }
+    #already-exists.show {
+      display: block;
+    }
 
-        </script>
-    </body>
+    body>main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1em;
+      padding: 1em;
+    }
+
+    /* ToDo: subgrid for main children */
+
+    .imageContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      aspect-ratio: 1;
+      margin-bottom: 1em;
+    }
+
+    .turnLeft {
+      transform: rotate(-90deg);
+    }
+
+    .turnRight {
+      transform: rotate(90deg);
+    }
+
+    .turnZero {
+      transform: rotate(0deg);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Image idenificator</h1>
+  <p><b>Output:</b> <span id="output"></span></p>
+  <main>
+    <div>
+      <h2>Input image</h2>
+      <div class="imageContainer">
+        <img id="input-image" src="" title="please wait" style="width: min(100%,400px)" />
+      </div>
+      <div class="grid">
+        <button class="secondary outline" onclick="document.getElementById('input-image').className = 'turnLeft'">Turn
+          left</button>
+        <button class="secondary" onclick="document.getElementById('input-image').className = 'turnZero'">Back to
+          starting point</button>
+        <button class="secondary outline" onclick="document.getElementById('input-image').className = 'turnRight'">Turn
+          right</button>
+      </div>
+      <p id="input-text"></p>
+    </div>
+    <div>
+      <h2>Suggested result: <span id="code"></span>(<span id="score">X</span>)</h2>
+      <div class="imageContainer">
+        <img id="suggested-image" src="" title="please wait" style="width: min(100%,400px)" />
+      </div>
+      <p id="already-exists">Esta carta ya existe! Si aceptas se sobreescribirá</p>
+      <div class="grid">
+        <button id="yes-button" onclick="sendMessage('yes')">Yes! They are the same!!!</button>
+        <button id="no-button" class="contrast" onclick="sendMessage('no')">Nop! Give me another suggestion</button>
+        <button id="skip-button" class="contrast outline" onclick="sendMessage('skip')">Something is weird, skip this
+          card and go to next</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    console.log("Script loaded")
+    let ws;
+    window.onload = function () {
+      console.log("Window loaded")
+      connect()
+    };
+    function connect() {
+      console.log("RunWebSocket")
+      buttonsDisable(true)
+      ws = new WebSocket("ws://localhost:8001/ws");
+      ws.onmessage = function (event) {
+        let data = JSON.parse(event.data);
+        switch (data.type) {
+          case "message":
+            console.log("message", data);
+            document.getElementById('output').innerHTML = data.message
+            break;
+          case "result":
+            buttonsDisable(false)
+            console.log("result", data)
+            document.getElementById('input-image').src = "/images/not_processed/" + data.input_image
+            document.getElementById('input-text').innerHTML = data.text
+            document.getElementById('suggested-image').src = 'https://marvelcdb.com/bundles/cards/' + data.result_code + '.png'
+            document.getElementById('code').innerHTML = data.result_code
+            document.getElementById('score').innerHTML = data.result_score
+            document.getElementById('already-exists').className = data.already_exists ? 'show' : '';
+            break;
+          default:
+            console.log("Unknown event type " + data.type)
+        }
+      };
+    }
+    function sendMessage(text) {
+      buttonsDisable(true)
+      if (text !== 'no') {
+        reinit_input_image()
+      }
+      ws.send(text)
+    }
+
+    function buttonsDisable(value) {
+      if (value) {
+        document.getElementById('suggested-image').src = ""
+        document.getElementById('code').innerHTML = ""
+        document.getElementById('score').innerHTML = ""
+        document.getElementById('already-exists').className = ''
+      }
+
+      document.getElementById('yes-button').disabled = value
+      document.getElementById('no-button').disabled = value
+      document.getElementById('skip-button').disabled = value
+    }
+
+    function reinit_input_image() {
+      document.getElementById('input-image').src = ""
+      document.getElementById('input-text').innerHTML = ""
+      document.getElementById('input-image').className = 'turnZero'
+    }
+
+  </script>
+</body>
+
 </html>
