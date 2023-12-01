@@ -33,10 +33,6 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     await process_images(websocket)
     await websocket.send_text(json_message("WS finished"))
-    # while True:
-    #     data = await websocket.receive_text()
-    #     print(data)
-    #     await websocket.send_text(f"Message text was: {data}")
 
 
 async def process_images(websocket: WebSocket):
@@ -52,11 +48,12 @@ async def process_images(websocket: WebSocket):
         sorted_similarity_scores = sorted(similarity_scores.items(), key=lambda x: x[1], reverse=True)
 
         best_match_code = sorted_similarity_scores[0][0]
-        #best_match_card = next(card for card in data if card['code'] == best_match_code)
         text = "starting"
         while text != 'yes' and text != 'skip' and len(sorted_similarity_scores) > 0:
             best_matching = sorted_similarity_scores.pop(0)
             best_match_code = best_matching[0]
+            # ToDo: proccess card from the other side!
+            # best_match_card = next(card for card in data if card['code'] == best_match_code)
             result_json = json_result(
                 file_name,
                 best_match_code,
