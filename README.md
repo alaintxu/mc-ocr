@@ -22,8 +22,10 @@ docker-compose up -d
 
 ## ToDo
 
-* Treat back images of cards. => done (not sure if working)
-* Rotate cards before moving => done
-* Transform cards to webp. => done
-* Could work for any language changing tesseract language.
-* Update cards.json with new cards.
+* [ ] Search card manually.
+* [ ] Add code manually.
+* [ ] Update cards.json with new cards.
+* [ ] Could work for any language changing tesseract language.
+* [x] Treat back images of cards. => done (not sure if working)
+* [x] Rotate cards before moving => done
+* [x] Transform cards to webp. => done
