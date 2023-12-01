@@ -3,12 +3,15 @@ import re
 
 def get_texts_to_compare(cards_json):
     texts_to_compare = {}
+    cards_output = {}
     for card in cards_json:
+        cards_output[card['code']] = card
         texts_to_compare[card['code']] = add_card_data_to_compare(card)
         if "linked_card" in card.keys():
             linked_card = card["linked_card"]
+            cards_output[linked_card['code']] = linked_card
             texts_to_compare[linked_card['code']] = add_card_data_to_compare(linked_card)
-    return texts_to_compare
+    return texts_to_compare, cards_output
 
 
 def clean_text(text):
@@ -35,4 +38,4 @@ def add_card_data_to_compare(input_card, input_text_to_compare=""):
 
 with open('jsons/cards.json') as f:
     json_data = json.load(f)
-    data = get_texts_to_compare(json_data)
+    data, cards = get_texts_to_compare(json_data)

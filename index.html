@@ -2,7 +2,9 @@
 <html>
 
 <head>
-  <title>Image identificator</title>
+  <title>Identificador de imágenes de MC</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
   <style>
     img {
@@ -18,79 +20,101 @@
       display: block;
     }
 
+    #input-file-name {
+      word-break: break-all;
+    }
+
     body>main {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      grid-auto-rows: auto auto auto auto;
       gap: 1em;
       padding: 1em;
     }
 
-    /* ToDo: subgrid for main children */
+    body>main>div {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 4;
+      gap: 1em;
+      align-items: center;
+      justify-items: center;
+    }
 
     .imageContainer {
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100%;
-      aspect-ratio: 1;
+      height: auto;
       margin-bottom: 1em;
     }
-
-    .turnLeft {
-      transform: rotate(-90deg);
-    }
-
-    .turnRight {
-      transform: rotate(90deg);
-    }
-
-    .turnZero {
-      transform: rotate(0deg);
+    .flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1em;
     }
   </style>
 </head>
 
 <body>
-  <h1>Image idenificator</h1>
-  <p><b>Output:</b> <span id="output"></span></p>
+  <h1>Identificador de imágenes de MC</h1>
+  <p><b>Mensaje:</b> <span id="output"></span></p>
   <main>
     <div>
-      <h2>Input image</h2>
+      <header>
+        <h2>Imagen a reconocer:</h2>
+        <p id="input-file-name">espera...</p>
+      </header>
       <div class="imageContainer">
-        <img id="input-image" src="" title="please wait" style="width: min(100%,400px)" />
+        <img id="input-image" src="" title="please wait" alt="Imagen de entrada"/>
       </div>
-      <div class="grid">
-        <button class="secondary outline" onclick="document.getElementById('input-image').className = 'turnLeft'">Turn
-          left</button>
-        <button class="secondary" onclick="document.getElementById('input-image').className = 'turnZero'">Back to
-          starting point</button>
-        <button class="secondary outline" onclick="document.getElementById('input-image').className = 'turnRight'">Turn
-          right</button>
+      <div class="flex">
+        <button class="secondary outline" onclick="do_turn(-90)">Izquierda</button>
+        <button class="secondary" onclick="do_turn(0)">No girar</button>
+        <button class="secondary outline" onclick="do_turn(90)">Derecha</button>
       </div>
       <p id="input-text"></p>
     </div>
     <div>
-      <h2>Suggested result: <span id="code"></span>(<span id="score">X</span>)</h2>
+      <header>
+        <h2>Sugerencia:</h2>
+        <p><a id="code" href="" target="_blank"></a>(<span id="score">X</span>)</p>
+        <!-- ToDo: make this work
+        <label>
+          Card title
+          <input id="card-name" type="text" placeholder="Card title" />
+        </label>
+        <button onclick="sendMessage('find')">Find</button>
+        -->
+      </header>
       <div class="imageContainer">
-        <img id="suggested-image" src="" title="please wait" style="width: min(100%,400px)" />
+        <img id="suggested-image" alt="Suggested image" src="" title="please wait" style="width: min(100%,400px)" />
+      </div>
+      <div class="flex">
+        <button id="yes-button" onclick="sendMessage('yes')">¡Son la misma!</button>
+        <button id="skip-button" class="contrast" onclick="sendMessage('skip')">¡No! Siguiente carta</button>
+        <button id="no-button" class="contrast outline" onclick="sendMessage('no')">No, pero te doy otra oportunidad...</button>
       </div>
       <p id="already-exists">Esta carta ya existe! Si aceptas se sobreescribirá</p>
-      <div class="grid">
-        <button id="yes-button" onclick="sendMessage('yes')">Yes! They are the same!!!</button>
-        <button id="no-button" class="contrast" onclick="sendMessage('no')">Nop! Give me another suggestion</button>
-        <button id="skip-button" class="contrast outline" onclick="sendMessage('skip')">Something is weird, skip this
-          card and go to next</button>
-      </div>
     </div>
   </main>
 
   <script>
-    console.log("Script loaded")
+    console.log("Script loaded");
+    let turn = 0;
     let ws;
     window.onload = function () {
       console.log("Window loaded")
       connect()
     };
+
+    function do_turn(degrees) {
+      turn = degrees;
+      document.getElementById('input-image').style.transform = 'rotate(' + turn + 'deg)';
+
+    }
     function connect() {
       console.log("RunWebSocket")
       buttonsDisable(true)
@@ -103,13 +127,15 @@
             document.getElementById('output').innerHTML = data.message
             break;
           case "result":
-            buttonsDisable(false)
-            console.log("result", data)
-            document.getElementById('input-image').src = "/images/not_processed/" + data.input_image
-            document.getElementById('input-text').innerHTML = data.text
-            document.getElementById('suggested-image').src = 'https://marvelcdb.com/bundles/cards/' + data.result_code + '.png'
-            document.getElementById('code').innerHTML = data.result_code
-            document.getElementById('score').innerHTML = data.result_score
+            buttonsDisable(false);
+            console.log("result", data);
+            document.getElementById('input-file-name').innerHTML = data.input_image;
+            document.getElementById('input-image').src = "/images/not_processed/" + data.input_image;
+            document.getElementById('input-text').innerHTML = data.text;
+            document.getElementById('suggested-image').src = 'https://marvelcdb.com/bundles/cards/' + data.result_code + '.png';
+            document.getElementById('code').innerHTML = data.result_code;
+            document.getElementById('code').href = 'https://es.marvelcdb.com/card/' + data.result_code;
+            document.getElementById('score').innerHTML = data.result_score+"%";
             document.getElementById('already-exists').className = data.already_exists ? 'show' : '';
             break;
           default:
@@ -118,30 +144,38 @@
       };
     }
     function sendMessage(text) {
-      buttonsDisable(true)
-      if (text !== 'no') {
-        reinit_input_image()
+      buttonsDisable(true);
+      let action = {
+          text: text,
+          degrees: turn * -1,
       }
-      ws.send(text)
+
+      if (text === 'find') action.card_title = document.getElementById('card-title').value;
+
+      if (text !== 'no') {
+        reinit_input_image();
+      }
+      ws.send(JSON.stringify(action));
     }
 
     function buttonsDisable(value) {
       if (value) {
-        document.getElementById('suggested-image').src = ""
-        document.getElementById('code').innerHTML = ""
-        document.getElementById('score').innerHTML = ""
-        document.getElementById('already-exists').className = ''
+        document.getElementById('input-file-name').innerHTML = "please wait";
+        document.getElementById('suggested-image').src = "";
+        document.getElementById('code').innerHTML = "";
+        document.getElementById('score').innerHTML = "";
+        document.getElementById('already-exists').className = '';
       }
 
-      document.getElementById('yes-button').disabled = value
-      document.getElementById('no-button').disabled = value
-      document.getElementById('skip-button').disabled = value
+      document.getElementById('yes-button').disabled = value;
+      document.getElementById('no-button').disabled = value;
+      document.getElementById('skip-button').disabled = value;
     }
 
     function reinit_input_image() {
-      document.getElementById('input-image').src = ""
-      document.getElementById('input-text').innerHTML = ""
-      document.getElementById('input-image').className = 'turnZero'
+      document.getElementById('input-image').src = "";
+      document.getElementById('input-text').innerHTML = "";
+      do_turn(0)
     }
 
   </script>
