@@ -5,7 +5,7 @@ import re
 import json
 import pytesseract
 from fastapi import WebSocket
-from data import data
+from data import data, clean_text
 
 
 def json_message(message):
@@ -20,19 +20,16 @@ def process_image_file(image):
     processed_text = clean_text(text.lower())
 
     similarity_scores = {}
-    text_to_compare_list = {}
 
     # Match with card id
-    for card in data:
-        text_to_compare = add_card_data_to_compare(card)
-        if "linked_card" in card.keys():
-            text_to_compare = add_card_data_to_compare(card["linked_card"], text_to_compare)
+    for card_code, text_to_compare in data.items():
+        #text_to_compare = data[card['code']]
 
         similarity_score = fuzz.token_set_ratio(text_to_compare, processed_text)
-        text_to_compare_list[card['code']] = text_to_compare
-        similarity_scores[card['code']] = similarity_score
+        #text_to_compare_list[card['code']] = text_to_compare
+        similarity_scores[card_code] = similarity_score
 
-    return processed_text, similarity_scores, text_to_compare_list
+    return processed_text, similarity_scores
 
 
 async def process_images(websocket: WebSocket):
@@ -43,7 +40,7 @@ async def process_images(websocket: WebSocket):
     for image_file in image_files:
         file_name = os.path.basename(image_file)
         image = Image.open(os.path.join(directory, image_file))
-        processed_text, similarity_scores, text_to_compare_list = process_image_file(image)
+        processed_text, similarity_scores = process_image_file(image)
 
         sorted_similarity_scores = sorted(similarity_scores.items(), key=lambda x: x[1], reverse=True)
 
@@ -52,8 +49,6 @@ async def process_images(websocket: WebSocket):
         while text != 'yes' and text != 'skip' and len(sorted_similarity_scores) > 0:
             best_matching = sorted_similarity_scores.pop(0)
             best_match_code = best_matching[0]
-            # ToDo: proccess card from the other side!
-            # best_match_card = next(card for card in data if card['code'] == best_match_code)
             result_json = json_result(
                 file_name,
                 best_match_code,
@@ -72,17 +67,15 @@ async def process_images(websocket: WebSocket):
     await websocket.send_text(json_message("Processing finished..."))
 
 
-
 def image_is_card(image: Image, card_code: str):
     # ToDo: Turn image if necessary
     file_name = os.path.basename(image.filename)
-    extension = file_name.split(".")[-1]
 
-    # ToDo: Convert to webp
-    image.save(f"./images/accepted/{card_code}.{extension}")
+    # extension = file_name.split(".")[-1]
+    image.save(f"./images/accepted/{card_code}.webp", format="webp")
 
     '''Move image to processed folder'''
-    os.rename(f"./images/not_processed/{file_name}", f"./images/processed/{card_code}.{extension}")
+    os.rename(f"./images/not_processed/{file_name}", f"./images/processed/{file_name}")
 
 
 def json_result(input_image, result_code, result_score, text):
@@ -95,25 +88,3 @@ def json_result(input_image, result_code, result_score, text):
         "already_exists": os.path.isfile(f"./images/accepted/{result_code}.jpg")
     }
     )
-
-
-def clean_text(text):
-    # Remove HTML tags
-    text = re.sub('<.*?>', ' ', text)
-
-    # Remove non-ASCII characters
-    #text = re.sub(r'[^\x00-\x7F]+', ' ', text)
-
-    # Remove line breaks and special characters, but keep á, é, í, ó, ú, ü, ñ
-    text = re.sub(r'\n|\r|\t|[^A-Za-z0-9 áéíóúüñ]+', ' ', text)
-
-    return text
-
-
-def add_card_data_to_compare(input_card, input_text_to_compare=""):
-    keys_to_check = ["name", "flavor", "traits", "text", "scheme_text", "attack_text", "card_set_name", "boost_text"]
-
-    for key in keys_to_check:
-        if key in input_card.keys() and input_card[key] is not None:
-            input_text_to_compare += " " + clean_text(input_card[key].lower())
-    return input_text_to_compare
