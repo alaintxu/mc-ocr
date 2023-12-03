@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# @ToDo: Load all images from uncut folder or crate a nautilus script for vertical and another for horizontal images
 # Load image
 input_image='./base_brigada_enemigos.jpg'
 
