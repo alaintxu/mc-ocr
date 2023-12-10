@@ -1,8 +1,9 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from utils import process_images, json_message
-from data import data
+from utils import process_images, json_message, json_uncut_images
+from data import data, cards, accepted_card_codes, get_uncut_image_list
+import json
 
 app = FastAPI()
 app.mount("/images", StaticFiles(directory="images"), name="images")
@@ -14,8 +15,51 @@ async def index():
     return FileResponse("index.html")
 
 
+@app.get("/status")
+async def status():
+    """return the HTML for the app status"""
+    return FileResponse("status.html")
+
+
+def add_accepted_to_card(card):
+    card['accepted'] = card["code"] in accepted_card_codes
+    return card
+
+
+@app.get("/status/data")
+async def status_data():
+    """Get all filenames of the images in /images/accepted"""
+    my_cards = [cards[key] for key in cards.keys()]
+    cards_are_accepted = list(map(add_accepted_to_card, my_cards))
+    return { "data": cards_are_accepted }
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     await process_images(websocket)
     await websocket.send_text(json_message("WS finished"))
+
+
+@app.get("/cut")
+async def cut():
+    """return the HTML for the cut functionality"""
+    return FileResponse("cut.html")
+
+
+@app.websocket("/cut-ws")
+async def websocket_cut_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    uncut_images = get_uncut_image_list()
+    await websocket.send_text(json_uncut_images(uncut_images))
+    
+    action_str = await websocket.receive_text()
+    print(f"ActionStr: {action_str}")
+    while action_str != "finished":
+        action = json.loads(action_str)
+        if action["type"] == "cut":
+            await websocket.send_text(json_message(f"Cutting not implemented yet"))
+        if action["type"] == "cut_and_turn":
+            await websocket.send_text(json_message(f"Cutting and turning not implemented yet"))
+    await websocket.send_text(json_message("WS finished"))
+    

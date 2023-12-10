@@ -22,6 +22,12 @@ def json_result(input_image, result_code, result_score, text):
     })
 
 
+def json_uncut_images(images):
+    return json.dumps({
+        "type": "uncut_images",
+        "images": images,
+    })
+
 def process_image_text(image):
     # Extract text from image
     text = pytesseract.image_to_string(image, lang="spa")

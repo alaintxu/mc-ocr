@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Cortar</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+
+    body>header {
+      margin: 0;
+      padding: 1em;
+      width: 100%;
+      background-color: lightsteelblue;
+      top: 0;
+      position: fixed;
+    }
+
+    body>main {
+      margin-top: 10em;
+    }
+
+    .img-div {
+      border: 1px solid black;
+      padding: 1em;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Cortador de imágenes de MC</h1>
+    <div class="d-flex gap-2">
+      <a href="/" class="btn btn-link">Identificador de imagenes</a>
+      <a href="/status" class="btn btn-link">Estado</a>
+    </div>
+    <div class="alert alert-info" role="alert" id="output">
+    </div>
+  </header>
+  <main>
+
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script>
+    console.log("Script loaded");
+    let turn = 0;
+    let ws;
+    window.onload = function () {
+      console.log("Window loaded")
+      connect()
+    };
+
+    function connect() {
+      console.log("RunWebSocket")
+      ws = new WebSocket("ws://localhost:8001/cut-ws");
+      ws.onmessage = function (event) {
+        let data = JSON.parse(event.data);
+        switch (data.type) {
+          case "message":
+            console.log("message", data);
+            document.getElementById('output').innerHTML = data.message
+            break;
+          case "uncut_images":
+            console.log(data)
+            const images = data.images;
+            images.map((image) => {
+              const img_div = document.createElement('div');
+              const img = document.createElement('img');
+              img_div.classList.add('img-div');
+              img.classList.add('img');
+              img.src = image.path;
+              img.loading = 'lazy';
+              img_div.appendChild(img);
+
+              const cut_btn = document.createElement('button');
+              cut_btn.className = 'btn btn-primary mt-4 mi-4';
+              cut_btn.innerText = 'Cortar';
+              cut_btn.addEventListener('click', () => {
+                sendMessage({
+                  type: 'cut',
+                  image: image
+                });
+              });
+
+              const cut_and_turn_btn = document.createElement('button');
+              cut_and_turn_btn.className = 'btn btn-primary mt-4';
+
+              cut_and_turn_btn.innerText = 'Cortar y girar';
+              cut_and_turn_btn.addEventListener('click', () => {
+                sendMessage({
+                  type: 'cut_and_turn',
+                  image: image
+                });
+              });
+
+              const delete_btn = document.createElement('button');
+              delete_btn.className = 'btn btn-danger mt-4';
+              delete_btn.innerText = 'Eliminar';
+              delete_btn.addEventListener('click', () => {
+                sendMessage({
+                  type: 'delete',
+                  image: image
+                });
+              });
+
+              const actions = document.createElement('div');
+              actions.className = "d-flex gap-2";
+
+              actions.appendChild(cut_btn);
+              actions.appendChild(cut_and_turn_btn);
+              actions.appendChild(delete_btn);
+
+              img_div.appendChild(actions);
+              document.querySelector('main').appendChild(img_div);
+            })
+            break;
+          default:
+            console.log("Unknown event type " + data.type)
+        }
+      };
+    }
+    function sendMessage(text) {
+      ws.send(JSON.stringify(text));
+    }
+
+  </script>
+</body>
+
+</html>
