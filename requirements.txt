@@ -5,3 +5,4 @@ python-Levenshtein==0.23.0
 fastapi==0.70.0
 websockets==10.0
 uvicorn==0.15.0
+pillow==10.1.0

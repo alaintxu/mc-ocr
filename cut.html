@@ -79,12 +79,14 @@
             document.getElementById('output').innerHTML = data.message
             break;
           case "uncut_images":
-            console.log(data)
+            console.log(data);
+            document.querySelector('main').innerHTML = '';
             const images = data.images;
             images.map((image) => {
               const img_div = document.createElement('div');
               const img = document.createElement('img');
               img_div.classList.add('img-div');
+              img_div.title = image.path;
               img.classList.add('img');
               img.src = image.path;
               img.loading = 'lazy';

@@ -126,3 +126,7 @@ def image_is_card(image: Image, image_file, card_code: str):
     '''Move and create folder if not exists'''
     os.makedirs(os.path.dirname(moved_filename), exist_ok=True)
     os.rename(image_file, moved_filename)
+
+
+def delete_image(image_path):
+    os.remove(image_path)

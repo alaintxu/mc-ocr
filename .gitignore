@@ -3,6 +3,7 @@
 venv
 __pycache__
 README.pdf
-cut/**
-not_processed/**
-processed/**
+images/cut/**
+images/not_processed/**
+images/processed/**
+images/not_processed_full/**

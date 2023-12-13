@@ -1,7 +1,9 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from utils import process_images, json_message, json_uncut_images
+
+from image_cutter import cut_image
+from utils import process_images, json_message, json_uncut_images, delete_image
 from data import data, cards, accepted_card_codes, get_uncut_image_list
 import json
 
@@ -58,8 +60,15 @@ async def websocket_cut_endpoint(websocket: WebSocket):
     while action_str != "finished":
         action = json.loads(action_str)
         if action["type"] == "cut":
-            await websocket.send_text(json_message(f"Cutting not implemented yet"))
+            cut_image(action["image"]["path"], False)
+            await websocket.send_text(json_message(f"Image {action['image']['path']} cut"))
         if action["type"] == "cut_and_turn":
             await websocket.send_text(json_message(f"Cutting and turning not implemented yet"))
+            cut_image(action["image"]["path"], True)
+            await websocket.send_text(json_message(f"Image {action['image']['path']} cut and turned"))
+        if action["type"] == "delete":
+            delete_image(action["image"]["path"])
+            await websocket.send_text(json_uncut_images(uncut_images))
+        action_str = await websocket.receive_text()
     await websocket.send_text(json_message("WS finished"))
     
