@@ -2,10 +2,11 @@ from PIL import Image
 import os
 
 CARD_HEIGHT = 1039
-CARD_WIDTH = 750
 
 
 def cut_image(image_path: str, turn: bool = False):
+    card_height = CARD_HEIGHT
+
     input_folder = os.path.dirname(image_path)
     output_folder = input_folder.replace("/uncut/", "/cut/")
     output2_folder = input_folder.replace("/uncut/", "/not_processed/")
@@ -13,17 +14,21 @@ def cut_image(image_path: str, turn: bool = False):
     input_image = Image.open(image_path)
     image_width, image_height = input_image.size
 
-    # Crop input image in multiple 744x1039 pixels images
+    for width in range(750, 740, -1):
+        if image_width % width == 0:
+            card_width = width
+            break
+
     h = 0
     while h < image_height:
         w = 0
         while w < image_width:
             # Create output paths
-            output_path = f"{output_folder}/{input_file_name}_{w//CARD_WIDTH+1}x{h//CARD_HEIGHT+1}.jpg"
-            output2_path = f"{output2_folder}/{input_file_name}_{w//CARD_WIDTH+1}x{h//CARD_HEIGHT+1}.jpg"
+            output_path = f"{output_folder}/{input_file_name}_{w//card_width+1}x{h//card_height+1}.jpg"
+            output2_path = f"{output2_folder}/{input_file_name}_{w//card_width+1}x{h//card_height+1}.jpg"
 
             # Crop image
-            output_image = input_image.crop((w, h, w + CARD_WIDTH, h + CARD_HEIGHT))
+            output_image = input_image.crop((w, h, w + card_width, h + card_height))
 
             # Rotate image if needed
             if turn:
@@ -42,5 +47,5 @@ def cut_image(image_path: str, turn: bool = False):
                 os.remove(output_path)
                 os.remove(output2_path)
 
-            w += CARD_WIDTH
-        h += CARD_HEIGHT
+            w += card_width
+        h += card_height
