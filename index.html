@@ -9,6 +9,8 @@
   <style>
     img {
       transition: transform 0.5s ease-in-out;
+      max-height: 100%;
+      max-width: 100%;
     }
 
     #already-exists {
@@ -27,15 +29,16 @@
     body>main {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-auto-rows: auto auto auto auto;
+      grid-auto-rows: auto auto auto auto auto;
       gap: 1em;
       padding: 1em;
     }
 
     body>main>div {
       display: grid;
+      grid-template-columns: 1fr;
       grid-template-rows: subgrid;
-      grid-row: span 4;
+      grid-row: span 5;
       gap: 1em;
       align-items: center;
       justify-items: center;
@@ -76,6 +79,11 @@
         <button class="secondary" onclick="do_turn(0)">No girar</button>
         <button class="secondary outline" onclick="do_turn(90)">Derecha</button>
       </div>
+      <div class="flex">
+        <button class="contrast" onclick="sendMessage('delete')">Borrar imágen</button>
+        <input id="manual-id" type="text" placeholder="ID manual" />
+        <button class="contrast" onclick="sendMessage('manual')">Identificar manualmente</button>
+      </div>
       <p id="input-text"></p>
     </div>
     <div>
@@ -100,6 +108,9 @@
           oportunidad...</button>
       </div>
       <p id="already-exists">Esta carta ya existe! Si aceptas se sobreescribirá</p>
+      <div>
+        -
+      </div>
     </div>
   </main>
 
@@ -150,6 +161,7 @@
       let action = {
         text: text,
         degrees: turn * -1,
+        manual_code: document.getElementById('manual-id').value
       }
 
       if (text === 'find') action.card_title = document.getElementById('card-title').value;

@@ -84,6 +84,9 @@
             const images = data.images;
             images.map((image) => {
               const img_div = document.createElement('div');
+              const title = document.createElement('h3');
+              title.innerText = image.path;
+              img_div.appendChild(title);
               const img = document.createElement('img');
               img_div.classList.add('img-div');
               img_div.title = image.path;
@@ -98,7 +101,8 @@
               cut_btn.addEventListener('click', () => {
                 sendMessage({
                   type: 'cut',
-                  image: image
+                  image: image,
+                  small: false
                 });
               });
 
@@ -109,7 +113,8 @@
               cut_and_turn_btn.addEventListener('click', () => {
                 sendMessage({
                   type: 'cut_and_turn',
-                  image: image
+                  image: image,
+                  small: false
                 });
               });
 
@@ -119,7 +124,7 @@
               delete_btn.addEventListener('click', () => {
                 sendMessage({
                   type: 'delete',
-                  image: image
+                  image: image,
                 });
               });
 

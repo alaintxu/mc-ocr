@@ -80,7 +80,7 @@ async def proces_image(image_file, websocket: WebSocket, directory):
         "text": "starting",
         "degrees": 0
     }
-    while action['text'] != 'yes' and action['text'] != 'skip' and len(
+    while action['text'] not in ['yes', 'manual', 'skip', 'delete'] and len(
             sorted_similarity_scores) > 0:
         best_matching = sorted_similarity_scores.pop(0)
         best_match_code = best_matching[0]
@@ -113,6 +113,10 @@ async def proces_image(image_file, websocket: WebSocket, directory):
         image.save(image_file)
     if action['text'] == 'yes':
         image_is_card(image, image_file, best_match_code)
+    if action['text'] == 'manual':
+        image_is_card(image, image_file, action['manual_code'])
+    if action['text'] == 'delete':
+        delete_image(image_file)
 
     return action
 
