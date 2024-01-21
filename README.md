@@ -1,5 +1,11 @@
 # Marvel Champions image namer using OCR
 
+Filtering app can be found in: [https://alaintxu.github.io/marvelcdb-filtering/](https://alaintxu.github.io/marvelcdb-filtering/)
+
+This repo contains the app for identifying images and the images itself.
+
+## Makin it work
+
 * Copy any MC images (in spanish) to '/images/not_processed'.
 * Copy the list of cards (in spanish) in json format to json folder.
 * Update volume mount for json file in docker-compose.yml.
@@ -23,7 +29,7 @@ docker-compose up -d
 ## ToDo
 
 * [ ] Search card manually.
-* [ ] Add code manually.
+* [x] Add code manually.
 * [ ] Update cards.json with new cards.
 * [ ] Could work for any language changing tesseract language.
 * [x] Treat back images of cards. => done (not sure if working)
