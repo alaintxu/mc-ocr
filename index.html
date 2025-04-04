@@ -13,6 +13,15 @@
       max-width: 100%;
     }
 
+    h1, h2 {
+      margin: 0;
+      padding: .25em;
+    }
+
+    .main-container {
+      padding: 0;
+    }
+
     #already-exists {
       display: none;
       color: red;
@@ -26,13 +35,13 @@
       word-break: break-all;
     }
 
-    body>main {
+    /*body>main {
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-auto-rows: auto auto auto auto auto;
       gap: 1em;
       padding: 1em;
-    }
+    }*/
 
     body>main>div {
       display: grid;
@@ -59,44 +68,60 @@
       align-items: center;
       gap: 1em;
     }
+
+    @media screen and (min-width: 720px) {
+      #my-form {
+        display: grid;
+        grid-template-areas: 
+        "header header"
+        "form1 image"
+        "form2 image"
+        "text image";
+        grid-template-columns: 1fr 1fr;
+        gap: 1em;
+        padding: 1em;
+      }
+
+      #my-form header {
+        grid-area: header;
+      }
+      #my-form .imageContainer {
+        grid-area: image;
+      }
+    }
+
   </style>
 </head>
 
 <body>
   <h1>Identificador de imágenes de MC</h1>
   <p><b>Mensaje:</b> <span id="output"></span></p>
-  <main>
-    <div>
+  <main class="main-container">
+    <form id="my-form">
       <header>
         <h2>Imagen a reconocer:</h2>
         <p id="input-file-name">espera...</p>
       </header>
       <div class="imageContainer">
-        <img id="input-image" src="" title="please wait" alt="Imagen de entrada" />
+        <img id="input-image" src="" title="please wait" alt="Imagen de entrada"/>
+      </div>
+
+      <div class="flex">
+        <button class="secondary outline" type="button" onclick="do_turn(-90)">Izquierda</button>
+        <button class="secondary" type="button" onclick="do_turn(0)">No girar</button>
+        <button class="secondary outline" type="button" onclick="do_turn(90)">Derecha</button>
       </div>
       <div class="flex">
-        <button class="secondary outline" onclick="do_turn(-90)">Izquierda</button>
-        <button class="secondary" onclick="do_turn(0)">No girar</button>
-        <button class="secondary outline" onclick="do_turn(90)">Derecha</button>
-      </div>
-      <div class="flex">
-        <button class="contrast" onclick="sendMessage('delete')">Borrar imágen</button>
+        <button class="contrast" type="button" onclick="sendMessage('delete')">Borrar imágen</button>
         <input id="manual-id" type="text" placeholder="ID manual" />
-        <button class="contrast" onclick="sendMessage('manual')">Identificar manualmente</button>
+        <button class="contrast" type="submit">Identificar manualmente</button>
       </div>
       <p id="input-text"></p>
-    </div>
-    <div>
+    </form>
+    <!--div>
       <header>
         <h2>Sugerencia:</h2>
         <p><a id="code" href="" target="_blank"></a>(<span id="score">X</span>)</p>
-        <!-- ToDo: make this work
-        <label>
-          Card title
-          <input id="card-name" type="text" placeholder="Card title" />
-        </label>
-        <button onclick="sendMessage('find')">Find</button>
-        -->
       </header>
       <div class="imageContainer">
         <img id="suggested-image" alt="Suggested image" src="" title="please wait" style="width: min(100%,400px)" />
@@ -111,7 +136,7 @@
       <div>
         -
       </div>
-    </div>
+    </div-->
   </main>
 
   <script>
@@ -119,8 +144,12 @@
     let turn = 0;
     let ws;
     window.onload = function () {
-      console.log("Window loaded")
-      connect()
+      console.log("Window loaded");
+      connect();
+      document.getElementById('my-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        sendMessage('manual');
+      });
     };
 
     function do_turn(degrees) {
@@ -131,7 +160,7 @@
     function connect() {
       console.log("RunWebSocket")
       buttonsDisable(true)
-      ws = new WebSocket("ws://localhost:8001/ws");
+      ws = new WebSocket("ws://localhost:8000/ws");
       ws.onmessage = function (event) {
         let data = JSON.parse(event.data);
         switch (data.type) {
@@ -145,11 +174,11 @@
             document.getElementById('input-file-name').innerHTML = data.input_image;
             document.getElementById('input-image').src = data.input_image;
             document.getElementById('input-text').innerHTML = data.text;
-            document.getElementById('suggested-image').src = 'https://marvelcdb.com/bundles/cards/' + data.result_code + '.png';
+            /*document.getElementById('suggested-image').src = 'https://marvelcdb.com/bundles/cards/' + data.result_code + '.png';
             document.getElementById('code').innerHTML = data.result_code;
             document.getElementById('code').href = 'https://es.marvelcdb.com/card/' + data.result_code;
             document.getElementById('score').innerHTML = data.result_score + "%";
-            document.getElementById('already-exists').className = data.already_exists ? 'show' : '';
+            document.getElementById('already-exists').className = data.already_exists ? 'show' : '';*/
             break;
           default:
             console.log("Unknown event type " + data.type)
@@ -175,15 +204,15 @@
     function buttonsDisable(value) {
       if (value) {
         document.getElementById('input-file-name').innerHTML = "please wait";
-        document.getElementById('suggested-image').src = "";
+        /*document.getElementById('suggested-image').src = "";
         document.getElementById('code').innerHTML = "";
         document.getElementById('score').innerHTML = "";
-        document.getElementById('already-exists').className = '';
+        document.getElementById('already-exists').className = '';*/
       }
 
-      document.getElementById('yes-button').disabled = value;
+      /*document.getElementById('yes-button').disabled = value;
       document.getElementById('no-button').disabled = value;
-      document.getElementById('skip-button').disabled = value;
+      document.getElementById('skip-button').disabled = value;*/
     }
 
     function reinit_input_image() {

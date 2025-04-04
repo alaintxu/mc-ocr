@@ -8,8 +8,8 @@ def cut_image(image_path: str, turn: bool = False):
     card_height = CARD_HEIGHT
 
     input_folder = os.path.dirname(image_path)
-    output_folder = input_folder.replace("/uncut/", "/cut/")
-    output2_folder = input_folder.replace("/uncut/", "/not_processed/")
+    output_folder = input_folder.replace("/uncut", "/cut")
+    output2_folder = input_folder.replace("/uncut", "/not_processed")
     input_file_name = os.path.basename(image_path).split(".")[0]
     input_image = Image.open(image_path)
     image_width, image_height = input_image.size
@@ -24,8 +24,8 @@ def cut_image(image_path: str, turn: bool = False):
         w = 0
         while w < image_width:
             # Create output paths
-            output_path = f"{output_folder}/{input_file_name}_{w//card_width+1}x{h//card_height+1}.jpg"
-            output2_path = f"{output2_folder}/{input_file_name}_{w//card_width+1}x{h//card_height+1}.jpg"
+            output_path = f"{output_folder}/{input_file_name}_{h//card_height+1}x{w//card_width+1}.jpg"
+            output2_path = f"{output2_folder}/{input_file_name}_{h//card_height+1}x{w//card_width+1}.jpg"
 
             # Crop image
             output_image = input_image.crop((w, h, w + card_width, h + card_height))
@@ -42,10 +42,13 @@ def cut_image(image_path: str, turn: bool = False):
             output_image.save(output_path)
             output_image.save(output2_path)
 
-            # Delete if they are all black (smaller than 50KB)
-            if os.path.getsize(output_path) < 50000:
-                os.remove(output_path)
-                os.remove(output2_path)
+            try:
+                # Delete if they are all black (smaller than 50KB)
+                if os.path.getsize(output_path) < 50000:
+                    os.remove(output_path)
+                    os.remove(output2_path)
+            except Exception as e:
+                print(f"Error deleting file: {e}")
 
             w += card_width
         h += card_height

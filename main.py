@@ -16,6 +16,10 @@ async def index():
     """return HTMLResponse with index.html"""
     return FileResponse("index.html")
 
+@app.get("/old")
+async def index_old():
+    """return HTMLResponse with index_old.html"""
+    return FileResponse("index_old.html")
 
 @app.get("/status")
 async def status():

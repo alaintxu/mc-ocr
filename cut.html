@@ -70,7 +70,7 @@
 
     function connect() {
       console.log("RunWebSocket")
-      ws = new WebSocket("ws://localhost:8001/cut-ws");
+      ws = new WebSocket("ws://localhost:8000/cut-ws");
       ws.onmessage = function (event) {
         let data = JSON.parse(event.data);
         switch (data.type) {

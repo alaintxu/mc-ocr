@@ -3,7 +3,23 @@
 {
 	"name": "Python 3",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm"
+	"image": "registry.gitlab.com/mu-bd-ce/devcontainers/python:latest",
+    "postCreateCommand": "create_env ${containerEnv:HOME}",
+	"features": {
+        "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+			// sqlite3 as we want to use SQLite databases.
+			// graphviz is used to generate UML diagrams using PlantUML.
+            "packages": "tesseract-ocr tesseract-ocr-spa"
+        }
+	},
+	"customizations": {
+        "vscode": {
+            "settings": {
+                // Path to the Python interpreter in the virtual environment.
+                "python.defaultInterpreterPath": "${containerEnv:HOME}/.env/bin/python"
+            }
+		}
+	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

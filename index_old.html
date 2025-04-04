@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Identificador de imágenes de MC</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <style>
+    img {
+      transition: transform 0.5s ease-in-out;
+      max-height: 100%;
+      max-width: 100%;
+    }
+
+    #already-exists {
+      display: none;
+      color: red;
+    }
+
+    #already-exists.show {
+      display: block;
+    }
+
+    #input-file-name {
+      word-break: break-all;
+    }
+
+    body>main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: auto auto auto auto auto;
+      gap: 1em;
+      padding: 1em;
+    }
+
+    body>main>div {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: subgrid;
+      grid-row: span 5;
+      gap: 1em;
+      align-items: center;
+      justify-items: center;
+    }
+
+    .imageContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: auto;
+      margin-bottom: 1em;
+    }
+
+    .flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1em;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Identificador de imágenes de MC</h1>
+  <p><b>Mensaje:</b> <span id="output"></span></p>
+  <main>
+    <div>
+      <header>
+        <h2>Imagen a reconocer:</h2>
+        <p id="input-file-name">espera...</p>
+      </header>
+      <div class="imageContainer">
+        <img id="input-image" src="" title="please wait" alt="Imagen de entrada" />
+      </div>
+      <div class="flex">
+        <button class="secondary outline" onclick="do_turn(-90)">Izquierda</button>
+        <button class="secondary" onclick="do_turn(0)">No girar</button>
+        <button class="secondary outline" onclick="do_turn(90)">Derecha</button>
+      </div>
+      <div class="flex">
+        <button class="contrast" onclick="sendMessage('delete')">Borrar imágen</button>
+        <input id="manual-id" type="text" placeholder="ID manual" />
+        <button class="contrast" onclick="sendMessage('manual')">Identificar manualmente</button>
+      </div>
+      <p id="input-text"></p>
+    </div>
+    <div>
+      <header>
+        <h2>Sugerencia:</h2>
+        <p><a id="code" href="" target="_blank"></a>(<span id="score">X</span>)</p>
+        <!-- ToDo: make this work
+        <label>
+          Card title
+          <input id="card-name" type="text" placeholder="Card title" />
+        </label>
+        <button onclick="sendMessage('find')">Find</button>
+        -->
+      </header>
+      <div class="imageContainer">
+        <img id="suggested-image" alt="Suggested image" src="" title="please wait" style="width: min(100%,400px)" />
+      </div>
+      <div class="flex">
+        <button id="yes-button" onclick="sendMessage('yes')">¡Son la misma!</button>
+        <button id="skip-button" class="contrast" onclick="sendMessage('skip')">¡No! Siguiente carta</button>
+        <button id="no-button" class="contrast outline" onclick="sendMessage('no')">No, pero te doy otra
+          oportunidad...</button>
+      </div>
+      <p id="already-exists">Esta carta ya existe! Si aceptas se sobreescribirá</p>
+      <div>
+        -
+      </div>
+    </div>
+  </main>
+
+  <script>
+    console.log("Script loaded");
+    let turn = 0;
+    let ws;
+    window.onload = function () {
+      console.log("Window loaded")
+      connect()
+    };
+
+    function do_turn(degrees) {
+      turn = degrees;
+      document.getElementById('input-image').style.transform = 'rotate(' + turn + 'deg)';
+
+    }
+    function connect() {
+      console.log("RunWebSocket")
+      buttonsDisable(true)
+      ws = new WebSocket("ws://localhost:8001/ws");
+      ws.onmessage = function (event) {
+        let data = JSON.parse(event.data);
+        switch (data.type) {
+          case "message":
+            console.log("message", data);
+            document.getElementById('output').innerHTML = data.message
+            break;
+          case "result":
+            buttonsDisable(false);
+            console.log("result", data);
+            document.getElementById('input-file-name').innerHTML = data.input_image;
+            document.getElementById('input-image').src = data.input_image;
+            document.getElementById('input-text').innerHTML = data.text;
+            document.getElementById('suggested-image').src = 'https://marvelcdb.com/bundles/cards/' + data.result_code + '.png';
+            document.getElementById('code').innerHTML = data.result_code;
+            document.getElementById('code').href = 'https://es.marvelcdb.com/card/' + data.result_code;
+            document.getElementById('score').innerHTML = data.result_score + "%";
+            document.getElementById('already-exists').className = data.already_exists ? 'show' : '';
+            break;
+          default:
+            console.log("Unknown event type " + data.type)
+        }
+      };
+    }
+    function sendMessage(text) {
+      buttonsDisable(true);
+      let action = {
+        text: text,
+        degrees: turn * -1,
+        manual_code: document.getElementById('manual-id').value
+      }
+
+      if (text === 'find') action.card_title = document.getElementById('card-title').value;
+
+      if (text !== 'no') {
+        reinit_input_image();
+      }
+      ws.send(JSON.stringify(action));
+    }
+
+    function buttonsDisable(value) {
+      if (value) {
+        document.getElementById('input-file-name').innerHTML = "please wait";
+        document.getElementById('suggested-image').src = "";
+        document.getElementById('code').innerHTML = "";
+        document.getElementById('score').innerHTML = "";
+        document.getElementById('already-exists').className = '';
+      }
+
+      document.getElementById('yes-button').disabled = value;
+      document.getElementById('no-button').disabled = value;
+      document.getElementById('skip-button').disabled = value;
+    }
+
+    function reinit_input_image() {
+      document.getElementById('input-image').src = "";
+      document.getElementById('input-text').innerHTML = "";
+      do_turn(0)
+    }
+
+  </script>
+</body>
+
+</html>
