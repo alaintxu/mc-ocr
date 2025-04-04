@@ -64,7 +64,7 @@ def get_not_processed_images(directory):
     for root, dirs, files in os.walk(directory):
         for file in files:
             image_files.append(os.path.join(root, file))
-    return image_files
+    return sorted(image_files)
 
 
 async def proces_image(image_file, websocket: WebSocket, directory):
