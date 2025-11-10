@@ -10,6 +10,7 @@ def cut_image(image_path: str, turn: bool = False):
     input_folder = os.path.dirname(image_path)
     output_folder = input_folder.replace("/uncut", "/cut")
     output2_folder = input_folder.replace("/uncut", "/not_processed")
+    print(input_folder, output_folder, output2_folder)
     input_file_name = os.path.basename(image_path).split(".")[0]
     input_image = Image.open(image_path)
     image_width, image_height = input_image.size

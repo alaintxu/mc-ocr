@@ -1,8 +1,8 @@
-pytesseract==0.3.10
+pytesseract==0.3.13
 fuzzywuzzy==0.18.0
-pandas==2.1.3
-python-Levenshtein==0.23.0
-fastapi==0.70.0
-websockets==10.0
-uvicorn==0.15.0
-pillow==10.1.0
+pandas==2.3.3
+python-Levenshtein==0.27.3
+fastapi==0.121.1
+websockets==15.0.1
+granian==0.7.6
+pillow==12.0.0

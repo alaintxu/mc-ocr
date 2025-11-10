@@ -1,6 +1,9 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+import mimetypes
+
+mimetypes.add_type("image/webp", ".webp")
 
 from image_cutter import cut_image
 from utils import process_images, json_message, json_uncut_images, delete_image
@@ -75,4 +78,4 @@ async def websocket_cut_endpoint(websocket: WebSocket):
             await websocket.send_text(json_uncut_images(uncut_images))
         action_str = await websocket.receive_text()
     await websocket.send_text(json_message("WS finished"))
-    
+

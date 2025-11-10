@@ -1,0 +1,19 @@
+[project]
+name = "mc-ocr"
+version = "0.1.0"
+description = "An OCR application for MC cards"
+requires-python = ">=3.11"
+dependencies = [
+    "pytesseract==0.3.13",
+    "fuzzywuzzy==0.18.0",
+    "pandas==2.3.3",
+    "python-Levenshtein==0.27.3",
+    "fastapi==0.121.1",
+    "websockets==15.0.1",
+    "granian==0.7.6",
+    "hypercorn>=0.17.3",
+    "pillow==12.0.0"
+]
+
+[project.optional-dependencies]
+dev = []

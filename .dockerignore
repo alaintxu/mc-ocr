@@ -1,0 +1,17 @@
+# Ignore images folder
+images/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*egg-info/
+.pytest_cache/
+
+# Git
+.git/
+.gitignore
+
+# VSCode
+.vscode/
