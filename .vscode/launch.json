@@ -12,6 +12,7 @@
             "args": [
                 "--interface",
                 "asgi",
+                "--reload",
                 "main:app"
             ],
             "justMyCode": true,

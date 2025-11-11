@@ -15,4 +15,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = []
+dev = [
+    "granian[reload]==2.5.7"
+]

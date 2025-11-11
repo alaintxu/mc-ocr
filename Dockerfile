@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.13-slim-bookworm
+FROM python:3.14-slim-trixie
 
 # Set the working directory in the container to /app
 WORKDIR /app
@@ -17,12 +17,6 @@ COPY pyproject.toml .
 
 # Sync dependencies (uv will resolve and install)
 RUN uv sync
-
-# Copy only requirements to cache them in docker layer
-#COPY requirements.txt ./
-
-# Install project dependencies
-#RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the code
 COPY . /app
