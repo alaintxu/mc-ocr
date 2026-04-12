@@ -1,27 +1,39 @@
 {
-    "name": "Python",
-    "image": "registry.gitlab.com/mu-bd-ce/devcontainers/python:latest",
-    // Command to run after the container is created to set up the environment.
-    "postCreateCommand": "uv venv",
-    "postStartCommand": "if [ -f pyproject.toml ]; then uv sync --extra dev; fi",
-
+    "name": "Python",    
+    "image": "mcr.microsoft.com/devcontainers/python:3.14-trixie",
     "features": {
         "ghcr.io/va-h/devcontainers-features/uv:1": {},
         "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			// sqlite3 as we want to use SQLite databases.
-			// graphviz is used to generate UML diagrams using PlantUML.
+            // sqlite3 as we want to use SQLite databases.
+            // graphviz is used to generate UML diagrams using PlantUML.
             "packages": "tesseract-ocr tesseract-ocr-spa"
         }
     },
+    "containerEnv": {
+        "UV_PROJECT_ENVIRONMENT": "/tmp/venv"
+    },
+    // Allow the container to access host files on SELinux-enforcing systems (e.g. Fedora).
+    "runArgs": ["--security-opt", "label=disable"],
+
+    // Command to run after the container is created to set up the environment.
+    "postCreateCommand": "uv venv --clear",
+    "postStartCommand": "if [ -f pyproject.toml ]; then uv sync --extra dev; fi",
+
     "customizations": {
         "vscode": {
             "settings": {
                 // Path to the Python interpreter in the virtual environment.
-                "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+                "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+                "python.languageServer": "Pylance",
+                "python.defaultFormatter": "charliermarsh.ruff"
             },
             "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
                 "streetsidesoftware.code-spell-checker",
-                "streetsidesoftware.code-spell-checker-spanish"
+                "streetsidesoftware.code-spell-checker-spanish",
+                "charliermarsh.ruff",
+                "ms-azuretools.vscode-docker"
             ]
         }
     }
