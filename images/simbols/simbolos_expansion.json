@@ -1,0 +1,125 @@
+{
+  "fuente_nombres": "Texto de cada reglamento (sección «Símbolo de la expansión»)",
+  "fuente_codigos_marvelcdb": "https://es.marvelcdb.com/api/public/packs/",
+  "expansiones": [
+    {
+      "nombre": "El Duende Verde",
+      "codigo_mc": "MC02",
+      "codigo_marvelcdb": "gob",
+      "documento": "MC02ES_El-Duende-Verde_Reglamento.pdf",
+      "icono": "MC02-gob.webp"
+    },
+    {
+      "nombre": "Brigada de Demolición",
+      "codigo_mc": "MC03",
+      "codigo_marvelcdb": "twc",
+      "documento": "MC03ES_Brigada-de-Demolicion_Reglamento.pdf",
+      "icono": "MC03-twc.webp"
+    },
+    {
+      "nombre": "La tiranía de Cráneo Rojo",
+      "codigo_mc": "MC10",
+      "codigo_marvelcdb": "trors",
+      "documento": "MC10ES_La-Tirania-de-Craneo-Rojo_Reglamento_RED.pdf",
+      "icono": "MC10-trors.webp"
+    },
+    {
+      "nombre": "Antiguo y futuro Kang",
+      "codigo_mc": "MC11",
+      "codigo_marvelcdb": "toafk",
+      "documento": "MC11ES_Antiguo-y-futuro-Kang_Reglamento.pdf",
+      "icono": "MC11-toafk.webp"
+    },
+    {
+      "nombre": "Los más buscados de la galaxia",
+      "codigo_mc": "MC16",
+      "codigo_marvelcdb": "gmw",
+      "documento": "MC16ES_Los-mas-buscados-de-la-galaxia_Reglamento_RED.pdf",
+      "icono": "MC16-gmw.webp"
+    },
+    {
+      "nombre": "La sombra del titán loco",
+      "codigo_mc": "MC21",
+      "codigo_marvelcdb": "mts",
+      "documento": "MC21ES_La-sombra-del-titan-loco_Reglamento.pdf",
+      "icono": "MC21-mts.webp"
+    },
+    {
+      "nombre": "El Encapuchado",
+      "codigo_mc": "MC24",
+      "codigo_marvelcdb": "hood",
+      "documento": "TheHood_Reglamento.pdf",
+      "icono": "MC24-hood.webp"
+    },
+    {
+      "nombre": "Motivos siniestros",
+      "codigo_mc": "MC27",
+      "codigo_marvelcdb": "sm",
+      "documento": "4.MotivosSiniestros_Reglamento.pdf",
+      "icono": "MC27-sm.webp"
+    },
+    {
+      "nombre": "Génesis mutante",
+      "codigo_mc": "MC32",
+      "codigo_marvelcdb": "mut_gen",
+      "documento": "MC32ES_Genesis-Mutante_Reglamento.pdf",
+      "icono": "MC32-mut_gen.webp"
+    },
+    {
+      "nombre": "MojoManía",
+      "codigo_mc": "MC39",
+      "codigo_marvelcdb": "mojo",
+      "documento": "MojoMania_Reglamento.pdf",
+      "icono": "MC39-mojo.webp"
+    },
+    {
+      "nombre": "La próxima evolución",
+      "codigo_mc": "MC40",
+      "codigo_marvelcdb": "next_evol",
+      "documento": "MC40ES_Proxima-Evolucion_Reglamento_compressed-1.pdf",
+      "icono": "MC40-next_evol.webp"
+    },
+    {
+      "nombre": "La era de Apocalipsis",
+      "codigo_mc": "MC45",
+      "codigo_marvelcdb": "aoa",
+      "documento": "7.Manual_EraApocalipsis.pdf",
+      "icono": "MC45-aoa.webp"
+    },
+    {
+      "nombre": "Agentes de S.H.I.E.L.D.",
+      "codigo_mc": "MC50",
+      "codigo_marvelcdb": "aos",
+      "documento": "MC50-Agentes_de_shield_reglamento.pdf",
+      "icono": "MC50-aos.webp"
+    },
+    {
+      "nombre": "La conjura del embaucador",
+      "codigo_mc": "MC55",
+      "codigo_marvelcdb": "tt",
+      "documento": "ReglasTricksterTakeover.pdf",
+      "icono": "MC55-tt.webp"
+    },
+    {
+      "nombre": "Civil War",
+      "codigo_mc": "MC56",
+      "codigo_marvelcdb": "cw",
+      "documento": "MC56ES_Rulebook_ES.pdf",
+      "icono": "MC56-cw.webp"
+    },
+    {
+      "nombre": "Sedición sintezoide",
+      "codigo_mc": "MC57",
+      "codigo_marvelcdb": "synthezoid",
+      "documento": "MC57ES_Reglamento_ES.pdf",
+      "icono": "MC57-synthezoid.webp"
+    },
+    {
+      "nombre": "No temeré ningún mal",
+      "codigo_mc": "MC60",
+      "codigo_marvelcdb": "fne",
+      "documento": "MC60-reglamento_NoTemereNigunMal.pdf",
+      "icono": "MC60-fne.webp"
+    }
+  ]
+}
